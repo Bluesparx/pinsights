@@ -44,7 +44,7 @@ export const oauth = async (req, res) => {
         const base64Auth = Buffer.from(authString).toString("base64");
 
         const post_headers = {
-            'Authorization': `Basic ${base64Auth}`,
+            Authorization: `Basic ${base64Auth}`,
             'Content-Type': 'application/x-www-form-urlencoded',
            };
 

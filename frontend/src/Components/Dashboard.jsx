@@ -10,12 +10,19 @@ const Review = () => {
   const [review, setReview] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const accessToken = sessionStorage.getItem('accessToken');
+  const [accessToken, setAccessToken] = useState(null);
+
+  useEffect(() => {
+    const storedToken = sessionStorage.getItem('accessToken');
+    setAccessToken(storedToken);
+  }, []);
 
   useEffect(() => {
     const fetchReview = async () => {
+      console.log('Review page mounted. Access token present:', !!accessToken);
+
       if (!accessToken) {
-        setError('Access token is required.');
+        setError('Access token is required. Please login first.');
         return;
       }
 
@@ -23,9 +30,12 @@ const Review = () => {
       setError('');
 
       try {
+        console.log('Sending review request to backend...');
         const response = await axios.post(`${import.meta.env.VITE_BACKEND}/fetch`, {
           accessToken,
         });
+
+        console.log('Review response:', response.data);
 
         if (response.data) {
           setReview(response.data);
@@ -36,6 +46,8 @@ const Review = () => {
         console.error('Error fetching review:', err);
         setError(
           err.response?.data?.error ||
+          err.response?.data?.details ||
+          err.message ||
           'Unable to generate review. Please try again later.'
         );
       } finally {
@@ -84,7 +96,8 @@ const Review = () => {
         <Navbar />
         <div className="flex items-center justify-center min-h-screen bg-black/20">
         <div className="flex flex-col items-center justify-center my-4 bg-black/80 rounded-lg p-4 max-w-md w-full">
-            <h3 className="text-gray-100 font-medium">Error analysing pins. Please try again later</h3>
+            <h3 className="text-gray-100 font-medium mb-2">Error analysing pins. Please try again later</h3>
+            <p className="text-sm text-gray-300 text-center whitespace-pre-wrap">{error}</p>
         </div>
         </div>
         <Footer/>
