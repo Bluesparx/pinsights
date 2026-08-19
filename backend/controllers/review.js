@@ -2,17 +2,19 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import axios from 'axios';
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import sharp from 'sharp';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+const genAI = new GoogleGenAI({
+    apiKey: GEMINI_API_KEY,
+});
 
 // ---------------------------------------------------------------------------
 // Rate-limit config (Gemini 2.0 Flash free tier: 15 RPM, 1 500 RPD)
-// Paid tier is far more generous; these constants keep us safe on free tier.
-// ---------------------------------------------------------------------------
-const GEMINI_RPM          = 15;          // requests per minute (free tier)
+
+const GEMINI_RPM          = 15;   
 const MIN_MS_BETWEEN_REQS = Math.ceil(60_000 / GEMINI_RPM); // ~4 000 ms
 const MAX_RETRIES         = 3;
 const BACKOFF_BASE_MS     = 5_000;       // 5 s base; doubles each retry
@@ -64,40 +66,34 @@ const callGeminiWithRetry = async (fn, retries = MAX_RETRIES) => {
 // ---------------------------------------------------------------------------
 
 const generateImageDescription = async (imageBuffer) => {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const base64Image = imageBuffer.toString('base64');
-    const imagePart = {
-        inlineData: { data: base64Image, mimeType: 'image/jpeg' },
-    };
-    return callGeminiWithRetry(async () => {
-        const result = await model.generateContent([
-            imagePart,
-            "Describe this image concisely in one sentence.",
-        ]);
-        return result.response.text().trim();
+    const base64Image = imageBuffer.toString("base64");
+
+    const response = await genAI.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [
+            {
+                inlineData: {
+                    data: base64Image,
+                    mimeType: "image/jpeg",
+                },
+            },
+            {
+                text: "Describe this image concisely in one sentence.",
+            },
+        ],
     });
-};
 
+    return response.text.trim();
+};
 const generateReviewText = async (prompt) => {
-    const tryModel = async (modelName) => {
-        const model = genAI.getGenerativeModel({ model: modelName });
-        return callGeminiWithRetry(async () => {
-            const result = await model.generateContent(prompt);
-            return result.response.text().trim();
-        });
-    };
+    const response = await genAI.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+    });
 
-    try {
-        return await tryModel('gemini-2.0-flash');
-    } catch (err) {
-        console.warn(`gemini-2.0-flash failed: ${err.message} – trying gemini-1.5-flash`);
-        return await tryModel('gemini-1.5-flash');
-    }
+    return response.text.trim();
 };
 
-// ---------------------------------------------------------------------------
-// Concurrency-limited map (avoids slamming the API with 6 calls at once)
-// ---------------------------------------------------------------------------
 const asyncPool = async (concurrency, items, fn) => {
     const results = [];
     const executing = new Set();
