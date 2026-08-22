@@ -11,26 +11,21 @@ const genAI = new GoogleGenAI({
     apiKey: GEMINI_API_KEY,
 });
 
-// ---------------------------------------------------------------------------
-// Rate-limit config (Gemini 2.0 Flash free tier: 15 RPM, 1 500 RPD)
 
-const GEMINI_RPM          = 15;   
-const MIN_MS_BETWEEN_REQS = Math.ceil(60_000 / GEMINI_RPM); // ~4 000 ms
-const MAX_RETRIES         = 3;
-const BACKOFF_BASE_MS     = 5_000;       // 5 s base; doubles each retry
-const IMAGE_CONCURRENCY   = 3;           // parallel image-description calls
+const GEMINI_RPM = 15;
+const MIN_MS_BETWEEN_REQS = Math.ceil(60_000 / GEMINI_RPM);
+const MAX_RETRIES = 3;
+const BACKOFF_BASE_MS = 5_000; 
+const IMAGE_CONCURRENCY = 3;     
 
-// Simple token-bucket: track last-N request timestamps and wait if needed
 const requestTimestamps = [];
 
 const waitForRateLimit = async () => {
     const now = Date.now();
-    // Drop timestamps older than 60 s
     while (requestTimestamps.length && now - requestTimestamps[0] >= 60_000) {
         requestTimestamps.shift();
     }
     if (requestTimestamps.length >= GEMINI_RPM) {
-        // Must wait until the oldest timestamp is 60 s old
         const waitMs = 60_000 - (now - requestTimestamps[0]) + 50; // +50 ms buffer
         await new Promise(r => setTimeout(r, waitMs));
         requestTimestamps.shift();
@@ -38,38 +33,12 @@ const waitForRateLimit = async () => {
     requestTimestamps.push(Date.now());
 };
 
-// Wrapper: wait for slot → call → retry on 429 with exponential backoff
-const callGeminiWithRetry = async (fn, retries = MAX_RETRIES) => {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-        await waitForRateLimit();
-        try {
-            return await fn();
-        } catch (err) {
-            const is429 = err?.status === 429 ||
-                          err?.response?.status === 429 ||
-                          err?.message?.includes('429') ||
-                          err?.message?.toLowerCase().includes('quota');
-
-            if (is429 && attempt < retries) {
-                const delay = BACKOFF_BASE_MS * 2 ** attempt;
-                console.warn(`Gemini 429 – waiting ${delay / 1000}s before retry ${attempt + 1}/${retries}`);
-                await new Promise(r => setTimeout(r, delay));
-                continue;
-            }
-            throw err;
-        }
-    }
-};
-
-// ---------------------------------------------------------------------------
-// Core helpers
-// ---------------------------------------------------------------------------
 
 const generateImageDescription = async (imageBuffer) => {
     const base64Image = imageBuffer.toString("base64");
 
     const response = await genAI.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash",
         contents: [
             {
                 inlineData: {
@@ -87,7 +56,7 @@ const generateImageDescription = async (imageBuffer) => {
 };
 const generateReviewText = async (prompt) => {
     const response = await genAI.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-2.0-flash",
         contents: prompt,
     });
 
@@ -100,7 +69,7 @@ const asyncPool = async (concurrency, items, fn) => {
 
     for (const item of items) {
         const promise = fn(item).then(r => { results.push({ status: 'fulfilled', value: r }); })
-                                .catch(e => { results.push({ status: 'rejected', reason: e }); });
+            .catch(e => { results.push({ status: 'rejected', reason: e }); });
         executing.add(promise);
         promise.finally(() => executing.delete(promise));
 
@@ -127,9 +96,6 @@ const generateImageDescriptions = async (imageUrls) => {
         .map(r => r.value);
 };
 
-// ---------------------------------------------------------------------------
-// Utility
-// ---------------------------------------------------------------------------
 
 const selectRandomItems = (items, count) => {
     const shuffled = [...items].sort(() => 0.5 - Math.random());
@@ -150,10 +116,6 @@ const extractPinText = (pin) =>
     pin?.link ||
     pin?.rich_summary?.text ||
     '';
-
-// ---------------------------------------------------------------------------
-// Route handler
-// ---------------------------------------------------------------------------
 
 const fetchReview = async (req, res) => {
     try {
@@ -179,7 +141,7 @@ const fetchReview = async (req, res) => {
         // Cap at 50 pins as per spec
         const candidate_pins = pins.slice(0, 50);
 
-        const imageUrls     = candidate_pins.map(extractPinImageUrl).filter(Boolean);
+        const imageUrls = candidate_pins.map(extractPinImageUrl).filter(Boolean);
         const pinDescriptions = candidate_pins.map(extractPinText).filter(Boolean);
 
         let descriptions = [];

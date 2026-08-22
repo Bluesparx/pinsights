@@ -5,7 +5,6 @@ import axios from 'axios';
 export const oauth = async (req, res) => {
     const { code, redirect_uri } = req.body;
 
-    // Validate the input parameters
     if (!code || !redirect_uri) {
         return res.status(400).json({
             error: 'Missing required parameters',
@@ -13,7 +12,6 @@ export const oauth = async (req, res) => {
         });
     }
 
-    // Check for required environment variables
     if (!process.env.PINTEREST_CLIENT_ID || !process.env.PINTEREST_CLIENT_SECRET) {
         console.error('Missing required environment variables');
         return res.status(500).json({
@@ -23,21 +21,11 @@ export const oauth = async (req, res) => {
     }
 
     try {
-        // Prepare request payload
-        // const post_data = {
-        //     'grant_type': 'authorization_code',
-        //     'code': code,
-        //     'redirect_uri': redirect_uri
-        // };
-        
         const params = new URLSearchParams();
         params.append('grant_type', 'authorization_code');
         params.append('code', code);
         params.append('redirect_uri', redirect_uri);
         
-        // console.log('Sending request with parameters:', params.toString());
-
-        // Auth header
         const clientId = process.env.PINTEREST_CLIENT_ID;
         const clientSecret = process.env.PINTEREST_CLIENT_SECRET;
         const authString = `${clientId}:${clientSecret}`;
@@ -52,7 +40,6 @@ export const oauth = async (req, res) => {
             headers: post_headers
         });
         // console.log(response.data)
-        // Extract tokens from the response
         const { access_token, refresh_token, expires_in } = response.data;
 
         if (!access_token) {
