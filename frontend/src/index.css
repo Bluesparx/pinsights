@@ -1,17 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Fraunces', Georgia, serif;
   line-height: 1.5;
-  font-weight: 400;
-  color: #111111;
-  background-image: url('./assets/background.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  font-weight: 500;
+
+  color: #2C2A54;
+  background-color: #FFF8EA;
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -19,20 +19,60 @@
 }
 
 a {
-  font-weight: 500;
-  color: #E60023;
+  font-weight: 600;
+  color: #FF6FA0;
   text-decoration: inherit;
+  transition: color 0.2s ease;
 }
-
 a:hover {
-  color: #AD081B;
+  color: #E8548A;
 }
 
-body,
-#root {
+body, #root {
   margin: 0;
   min-width: 100vw;
-  min-height: 100vh;
   overflow-x: hidden;
-  background-color: #F9F9F9;
+  min-height: 100vh;
+  background-color: #FFF8EA;
+}
+
+/* Smooth, organic feel for anything interactive that doesn't already
+   specify its own transition. */
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Gentle custom scrollbar so the modal's overflow scroll feels intentional */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #F3E7CE;
+  border-radius: 999px;
+}
+
+.pixel-corners {
+  clip-path: polygon(
+    0px calc(100% - 20px), 4px calc(100% - 20px), 4px calc(100% - 12px),
+    8px calc(100% - 12px), 8px calc(100% - 8px), 12px calc(100% - 8px),
+    12px calc(100% - 4px), 20px calc(100% - 4px), 20px 100%,
+    calc(100% - 20px) 100%, calc(100% - 20px) calc(100% - 4px),
+    calc(100% - 12px) calc(100% - 4px), calc(100% - 12px) calc(100% - 8px),
+    calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) calc(100% - 12px),
+    calc(100% - 4px) calc(100% - 12px), calc(100% - 4px) calc(100% - 20px),
+    100% calc(100% - 20px), 100% 20px, calc(100% - 4px) 20px,
+    calc(100% - 4px) 12px, calc(100% - 8px) 12px, calc(100% - 8px) 8px,
+    calc(100% - 12px) 8px, calc(100% - 12px) 4px, calc(100% - 20px) 4px,
+    calc(100% - 20px) 0px, 20px 0px, 20px 4px, 12px 4px, 12px 8px,
+    8px 8px, 8px 12px, 4px 12px, 4px 20px, 0px 20px
+  );
+}
+
+/* A filter outline follows the clipped stepped edge, unlike a normal border. */
+.pixel-border-black {
+  border: 0;
+  filter: drop-shadow(0 0 0 #000);
 }

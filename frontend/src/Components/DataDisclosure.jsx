@@ -16,22 +16,22 @@ const wontUse = [
 const DataDisclosure = ({ compact = false }) => (
     <div className={compact ? 'grid sm:grid-cols-2 gap-4' : 'grid sm:grid-cols-2 gap-6'}>
         <div>
-            <p className="text-sm font-bold text-pinterest-black mb-2">What we'll use</p>
+            <p className="text-sm font-bold text-ink mb-2">What we'll use</p>
             <ul className="space-y-2">
                 {willUse.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-pinterest-gray">
-                        <Check className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+                    <li key={item} className="flex items-start gap-2 text-sm text-ink/60">
+                        <Check className="w-4 h-4 text-candy-mint shrink-0 mt-0.5" />
                         <span>{item}</span>
                     </li>
                 ))}
             </ul>
         </div>
         <div>
-            <p className="text-sm font-bold text-pinterest-black mb-2">What we won't touch</p>
+            <p className="text-sm font-bold text-ink mb-2">What we won't touch</p>
             <ul className="space-y-2">
                 {wontUse.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-pinterest-gray">
-                        <X className="w-4 h-4 text-pinterest-red shrink-0 mt-0.5" />
+                    <li key={item} className="flex items-start gap-2 text-sm text-ink/60">
+                        <X className="w-4 h-4 text-candy-pink shrink-0 mt-0.5" />
                         <span>{item}</span>
                     </li>
                 ))}

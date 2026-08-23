@@ -41,27 +41,26 @@ const ReviewResult = () => {
     return (
         <>
             <Navbar />
-            <div className="min-h-[calc(100vh-64px)] bg-pinterest-cream flex items-center justify-center px-4 py-12">
+            <div className="min-h-[calc(100vh-64px)] bg-cream flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-xl">
                     <Link
                         to="/dashboard"
-                        className="inline-flex items-center gap-1 text-sm font-medium text-pinterest-gray hover:text-pinterest-black mb-4"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-ink/60 hover:text-ink mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to dashboard
                     </Link>
-
-                    <div className="bg-white rounded-3xl shadow-pin overflow-hidden">
-                        <div className="bg-pinterest-red p-5">
-                            <h2 className="text-white text-xl font-bold text-center">Your Pinterest Analysis</h2>
+                    <div className="bg-white pixel-corners shadow-warm overflow-hidden border-t-4 border-mustard">
+                        <div className="bg-ink p-5">
+                            <h2 className="text-cream text-xl font-display font-bold text-center">Your Pinterest Analysis</h2>
                         </div>
 
                         <div className="p-8">
                             {loading && (
                                 <div className="flex flex-col items-center justify-center py-10 space-y-3">
-                                    <Loader2 className="h-8 w-8 animate-spin text-pinterest-red" />
-                                    <p className="text-pinterest-black font-medium">Analyzing your pins…</p>
-                                    <p className="text-sm text-pinterest-gray text-center">
+                                    <Loader2 className="h-8 w-8 animate-spin text-candy-pink" />
+                                    <p className="text-ink font-medium">Analyzing your pins…</p>
+                                    <p className="text-sm text-ink/60 text-center">
                                         This can take a minute while we look through your boards.
                                     </p>
                                 </div>
@@ -69,11 +68,11 @@ const ReviewResult = () => {
 
                             {!loading && error && (
                                 <div className="text-center py-6">
-                                    <p className="text-pinterest-black font-medium mb-2">Couldn't generate a review</p>
-                                    <p className="text-sm text-pinterest-gray mb-6">{error}</p>
-                                    <button
-                                        onClick={generate}
-                                        className="inline-flex items-center gap-2 bg-pinterest-red hover:bg-pinterest-red-dark text-white font-bold py-2.5 px-6 rounded-full transition"
+                                    <p className="text-ink font-medium mb-2">Couldn't generate a review</p>
+                                    <p className="text-sm text-ink/60 mb-6">{error}</p>
+                                        <button
+                                            onClick={generate}
+                                            className="inline-flex items-center gap-2 bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
                                     >
                                         <RefreshCw className="w-4 h-4" />
                                         Try again
@@ -83,20 +82,20 @@ const ReviewResult = () => {
 
                             {!loading && !error && review && (
                                 <>
-                                    <p className="text-pinterest-black leading-relaxed whitespace-pre-line text-lg mb-6">
+                                    <p className="text-ink leading-relaxed whitespace-pre-line text-lg mb-6">
                                         {review}
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-3">
-                                        <button
-                                            onClick={generate}
-                                            className="flex-1 inline-flex items-center justify-center gap-2 border border-pinterest-gray-light hover:bg-pinterest-gray-light text-pinterest-black font-bold py-2.5 px-6 rounded-full transition"
-                                        >
+                                            <button
+                                                onClick={generate}
+                                                className="flex-1 inline-flex items-center justify-center gap-2 border-2 border-cream-deep hover:bg-cream-deep hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-2.5 px-6 pixel-corners transition-all duration-200"
+                                            >
                                             <RefreshCw className="w-4 h-4" />
                                             Generate another
                                         </button>
                                         <Link
                                             to="/dashboard"
-                                            className="flex-1 text-center bg-pinterest-red hover:bg-pinterest-red-dark text-white font-bold py-2.5 px-6 rounded-full transition"
+                                               className="flex-1 text-center bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
                                         >
                                             Done
                                         </Link>

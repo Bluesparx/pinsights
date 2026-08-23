@@ -1,27 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Loader2, Sparkles, Clock } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import api from '../api';
 import Navbar from './Navbar';
 import Footer from './Footer';
-
-const timeAgo = (iso) => {
-    const diff = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'just now';
-    if (mins < 60) return `${mins}m ago`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `${hrs}h ago`;
-    const days = Math.floor(hrs / 24);
-    if (days < 30) return `${days}d ago`;
-    return new Date(iso).toLocaleDateString();
-};
+import ReviewCard from './ReviewCard';
+import ReviewModal from './ReviewModal';
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
     const [reviews, setReviews] = useState([]);
     const [loading, setLoading] = useState(true);
     const [notLoggedIn, setNotLoggedIn] = useState(false);
+    const [activeReview, setActiveReview] = useState(null);
+    const [activeOrigin, setActiveOrigin] = useState(null);
+    const [activeAccent, setActiveAccent] = useState('bg-candy-pink');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -44,12 +37,18 @@ const Dashboard = () => {
         load();
     }, []);
 
+    const openReview = (review, cardEl, accentClass) => {
+        setActiveOrigin(cardEl ? cardEl.getBoundingClientRect() : null);
+        setActiveAccent(accentClass);
+        setActiveReview(review);
+    };
+
     if (loading) {
         return (
             <>
                 <Navbar />
                 <div className="flex items-center justify-center min-h-[70vh]">
-                    <Loader2 className="h-8 w-8 animate-spin text-pinterest-red" />
+                    <Loader2 className="h-8 w-8 animate-spin text-candy-pink" />
                 </div>
                 <Footer />
             </>
@@ -61,10 +60,10 @@ const Dashboard = () => {
             <>
                 <Navbar />
                 <div className="flex flex-col items-center justify-center min-h-[70vh] px-4 text-center gap-4">
-                    <p className="text-lg font-medium text-pinterest-black">You're not logged in yet.</p>
+                    <p className="text-lg font-medium text-ink">You're not logged in yet.</p>
                     <Link
                         to="/"
-                        className="bg-pinterest-red hover:bg-pinterest-red-dark text-white font-bold py-3 px-8 rounded-full transition"
+                            className="bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:scale-95 text-white font-bold py-3 px-8 pixel-corners transition-all duration-200 shadow-warm"
                     >
                         Continue with Pinterest
                     </Link>
@@ -77,31 +76,31 @@ const Dashboard = () => {
     return (
         <>
             <Navbar />
-            <div className="min-h-[calc(100vh-64px)] bg-pinterest-cream">
-                <div className="max-w-3xl mx-auto px-4 py-10">
-                    {/* Welcome banner */}
-                    <div className="bg-white rounded-3xl shadow-pin p-6 sm:p-8 mb-8 flex flex-col sm:flex-row sm:items-center gap-5 sm:justify-between">
+            <div className="min-h-[calc(100vh-64px)] bg-cream">
+                <div className="max-w-4xl mx-auto px-4 py-10">
+                    {/* Welcome */}
+                    <div className="bg-white pixel-corners shadow-warm p-6 sm:p-8 mb-10 flex flex-col sm:flex-row sm:items-center gap-5 sm:justify-between border-t-4 border-mustard">
                         <div className="flex items-center gap-4">
                             {user?.profile_image ? (
                                 <img
                                     src={user.profile_image}
                                     alt={user.username}
-                                    className="w-14 h-14 rounded-full object-cover"
+                                    className="w-14 h-14 rounded-full object-cover ring-4 ring-cream-deep"
                                     referrerPolicy="no-referrer"
                                 />
                             ) : (
-                                <div className="w-14 h-14 rounded-full bg-pinterest-red text-white flex items-center justify-center text-xl font-bold">
+                                <div className="w-14 h-14 bg-candy-pink text-white flex items-center justify-center text-xl font-bold ring-4 ring-cream-deep">
                                     {user?.username?.[0]?.toUpperCase() || '?'}
                                 </div>
                             )}
                             <div>
-                                <p className="text-sm text-pinterest-gray">Welcome back,</p>
-                                <p className="text-xl font-bold text-pinterest-black">@{user?.username}</p>
+                                <p className="text-sm text-ink/50">Welcome back,</p>
+                                <p className="text-xl font-display font-bold text-ink">@{user?.username}</p>
                             </div>
                         </div>
                         <button
                             onClick={() => navigate('/review/new')}
-                            className="inline-flex items-center justify-center gap-2 bg-pinterest-red hover:bg-pinterest-red-dark text-white font-bold py-3 px-6 rounded-full transition whitespace-nowrap"
+                            className="inline-flex items-center justify-center gap-2 bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-3 px-6 pixel-corners transition-all duration-200 shadow-warm whitespace-nowrap"
                         >
                             <Sparkles className="w-4 h-4" />
                             Generate a new review
@@ -109,42 +108,40 @@ const Dashboard = () => {
                     </div>
 
                     {/* Past reviews */}
-                    <h2 className="text-lg font-bold text-pinterest-black mb-4">Your past reviews</h2>
+                    <h2 className="text-lg font-display font-bold text-ink mb-1">Your past reviews</h2>
+                    <p className="text-sm text-ink/50 mb-6">Tap a card to read the full thing.</p>
 
                     {reviews.length === 0 ? (
-                        <div className="bg-white rounded-3xl shadow-pin p-10 text-center">
-                            <p className="text-pinterest-gray mb-4">
+                        <div className="bg-white pixel-corners shadow-warm p-10 text-center">
+                            <p className="text-ink/60 mb-4">
                                 No reviews yet — generate your first one and it'll show up here.
                             </p>
                             <button
                                 onClick={() => navigate('/review/new')}
-                                className="bg-pinterest-red hover:bg-pinterest-red-dark text-white font-bold py-2.5 px-6 rounded-full transition"
+                                    className="bg-candy-pink hover:bg-candy-pink-dark active:scale-95 text-white font-bold py-2.5 px-6 pixel-corners transition-all duration-200"
                             >
                                 Generate my first review
                             </button>
                         </div>
                     ) : (
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            {reviews.map((r) => (
-                                <div
-                                    key={r.id}
-                                    className="bg-white rounded-2xl shadow-pin p-5 flex flex-col"
-                                >
-                                    <p className="text-pinterest-black text-sm leading-relaxed whitespace-pre-line line-clamp-6 mb-3">
-                                        {r.review_text}
-                                    </p>
-                                    <div className="mt-auto flex items-center gap-1.5 text-xs text-pinterest-gray">
-                                        <Clock className="w-3.5 h-3.5" />
-                                        {timeAgo(r.created_at)}
-                                        {r.pin_count ? ` · based on ${r.pin_count} pins` : ''}
-                                    </div>
-                                </div>
+                        <div className="grid sm:grid-cols-2 gap-x-6 gap-y-10 py-2">
+                            {reviews.map((r, i) => (
+                                <ReviewCard key={r.id} review={r} index={i} onOpen={openReview} />
                             ))}
                         </div>
                     )}
                 </div>
             </div>
             <Footer />
+
+            {activeReview && (
+                <ReviewModal
+                    review={activeReview}
+                    originRect={activeOrigin}
+                    accentClass={activeAccent}
+                    onClose={() => setActiveReview(null)}
+                />
+            )}
         </>
     );
 };
