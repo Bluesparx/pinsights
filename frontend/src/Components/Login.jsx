@@ -1,33 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Loader2, Sparkles } from 'lucide-react';
+import api from '../api';
 import Footer from './Footer';
 import Navbar from './Navbar';
-import background from '../assets/background.png';
+import DataDisclosure from './DataDisclosure';
+
+const PIN_COLORS = ['bg-pinterest-red', 'bg-pinterest-black', 'bg-pinterest-gray'];
 
 const Login = () => {
-    const [accessToken, setAccessToken] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false); 
+    const [loading, setLoading] = useState(false);
+    const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const token = sessionStorage.getItem('accessToken');
+        const query = new URLSearchParams(window.location.search);
+        const authorizationCode = query.get('code');
 
-        if (token) {
-            setAccessToken(token);
-        } else {
-            const query = new URLSearchParams(window.location.search);
-            const authorizationCode = query.get('code');
-
-            if (authorizationCode) {
-                exchangeCodeForAccessToken(authorizationCode);
-            }
+        if (authorizationCode) {
+            exchangeCodeForSession(authorizationCode);
+            return;
         }
+
+        api.get('/auth/me')
+            .then(() => setAlreadyLoggedIn(true))
+            .catch(() => setAlreadyLoggedIn(false));
     }, []);
 
     const handlePinterestAuth = () => {
         const redirectUrl = import.meta.env.VITE_PINTEREST_REDIRECT_URI;
-
         const authorizationUrl = `https://www.pinterest.com/oauth/?client_id=${
             import.meta.env.VITE_PINTEREST_CLIENT_ID
         }&redirect_uri=${redirectUrl}&response_type=code&scope=user_accounts:read,boards:read,pins:read`;
@@ -35,43 +37,27 @@ const Login = () => {
         window.location.href = authorizationUrl;
     };
 
-    const exchangeCodeForAccessToken = async (authorizationCode) => {
-        setLoading(true); 
+    const exchangeCodeForSession = async (authorizationCode) => {
+        setLoading(true);
         try {
             const redirectUri = import.meta.env.VITE_PINTEREST_REDIRECT_URI;
 
-            const response = await axios.post(
-                `${import.meta.env.VITE_BACKEND}/oauth`,
-                {
-                    code: authorizationCode,
-                    redirect_uri: redirectUri,
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+            await api.post('/oauth', {
+                code: authorizationCode,
+                redirect_uri: redirectUri,
+            });
 
-            const { access_token } = response.data;
-
-            if (!access_token) {
-                throw new Error('No access token received from server');
-            }
-
-            setAccessToken(access_token);
-            sessionStorage.setItem('accessToken', access_token);
-            window.location.href = '/callback';
+            window.history.replaceState({}, '', '/');
+            navigate('/dashboard');
         } catch (err) {
             console.error('Pinterest OAuth error:', {
                 status: err.response?.status,
-                statusText: err.response?.statusText,
                 data: err.response?.data,
                 message: err.message,
             });
             setError(
                 err.response
-                    ? err.response.data.message || 'Failed to authenticate. Please try again.'
+                    ? err.response.data?.details || err.response.data?.error || 'Failed to authenticate. Please try again.'
                     : 'Network error. Please try again.'
             );
         } finally {
@@ -82,15 +68,15 @@ const Login = () => {
     if (loading) {
         return (
             <>
-            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
-                <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
-                <div className="text-center space-y-2">
-                    <p className="text-lg font-medium text-white">Connecting...</p>
-                    <p className="text-sm text-gray-500">
-                        Please wait while we connect to your Pinterest account.
-                    </p>
+                <Navbar />
+                <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-4">
+                    <Loader2 className="h-8 w-8 animate-spin text-pinterest-red" />
+                    <div className="text-center space-y-1">
+                        <p className="text-lg font-medium text-pinterest-black">Connecting…</p>
+                        <p className="text-sm text-pinterest-gray">Just a second while we set up your account.</p>
+                    </div>
                 </div>
-            </div>
+                <Footer />
             </>
         );
     }
@@ -98,31 +84,62 @@ const Login = () => {
     return (
         <>
             <Navbar />
-            <div
-                className="w-full h-screen bg-cover bg-center flex items-center justify-center"
-                style={{ backgroundImage: `url(${background})` }}
-            >
-                <div className="w-full max-w-2xl p-10 rounded-xl
-                    bg-black/80 bg-opacity-30 backdrop-blur-xl text-center font-[Ariel]">
-                    <h1 className="text-4xl text-white font-bold mb-6 text-center">Pinsights</h1>
-                    
-                    {error && <p className="text-red-500 mb-4">{error}</p>}
-                    <p className="text-lg text-gray-100 p-2 mb-2">Get AI-generated review based on your saves in Pinterest.</p>
-                    <button
-                        onClick={handlePinterestAuth}
-                        className="bg-red-600 max-w-64 hover:bg-red-700 text-white font-bold py-2 my-3 font-[Calibri] rounded-full w-full pr-2 pl-2 transition duration-200"
-                    >
-                        Authorize with Pinterest
-                    </button>
+            <div className="min-h-[calc(100vh-64px)] bg-pinterest-cream flex items-center justify-center px-4 py-12">
+                <div className="w-full max-w-lg">
+                    <div className="flex justify-center gap-2 mb-6">
+                        {PIN_COLORS.map((c, i) => (
+                            <div key={i} className={`w-3 rounded-full ${c}`} style={{ height: `${18 + i * 10}px` }} />
+                        ))}
+                    </div>
 
-                    <div className="mt-6">
-                        <p className="text-md text-gray-100">
-                            By logging in, you agree to our <a href="/privacy-policy" className="text-red-600 hover:underline">Privacy Policy</a>
+                    <div className="bg-white rounded-3xl shadow-pin p-8 sm:p-10 text-center">
+                        <h1 className="text-3xl font-extrabold text-pinterest-black mb-2 tracking-tight">
+                            Pinsights
+                        </h1>
+                        <p className="text-pinterest-gray mb-8">
+                            Let's find out your vibe in pinterest based on your saves! ^^ 
                         </p>
+
+                        {error && (
+                            <p className="text-sm text-pinterest-red bg-pinterest-red-light rounded-xl px-4 py-3 mb-6">
+                                {error}
+                            </p>
+                        )}
+
+                        {alreadyLoggedIn ? (
+                            <button
+                                onClick={() => navigate('/dashboard')}
+                                className="inline-flex items-center gap-2 bg-pinterest-red hover:bg-pinterest-red-dark text-white font-bold py-3 px-8 rounded-full transition"
+                            >
+                                <Sparkles className="w-4 h-4" />
+                                Go to your dashboard
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handlePinterestAuth}
+                                className="bg-pinterest-red hover:bg-pinterest-red-dark text-white font-bold py-3 px-8 rounded-full w-full max-w-xs transition"
+                            >
+                                Continue with Pinterest
+                            </button>
+                        )}
+
+                        <div className="mt-10 pt-8 border-t border-pinterest-gray-light text-left">
+                            <p className="text-sm text-pinterest-gray mb-4 text-center">
+                               What happens when you connect?
+                            </p>
+                            <DataDisclosure compact />
+                            <p className="text-xs text-pinterest-gray mt-6 text-center">
+                                We don't keep permanent copies of your pins or run any accounts of our own: see the{' '}
+                                <a href="/privacy-policy" className="text-pinterest-red font-medium hover:underline">
+                                    full privacy policy
+                                </a>{' '}
+                                for details.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </>
     );
 };

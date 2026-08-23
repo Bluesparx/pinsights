@@ -2,13 +2,14 @@ import React from 'react';
 
 const Footer = () => {
     return (
-        <footer className="bg-black/30  text-red-600 shadow-lg fixed bottom-0 w-full z-50">
-            <div className="max-w-6xl mx-auto px-2">
-            <div className="flex justify-center items-center h-8">
-            <p className="text-sm text-gray-800 dark:text-gray-200">
-                Copyright ©<a href='https://naziahassan.vercel.app'> Nazia Hassan</a> 2024
-            </p>
-            </div>
+        <footer className="border-t border-pinterest-gray-light bg-white">
+            <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <p className="text-xs text-pinterest-gray">
+                    Pinsights is an independent app and isn't affiliated with Pinterest, Inc.
+                </p>
+                <p className="text-xs text-pinterest-gray">
+                    © <a href="https://naziahassan.vercel.app" className="hover:text-pinterest-red">Nazia Hassan</a> 2024–2026
+                </p>
             </div>
         </footer>
     );

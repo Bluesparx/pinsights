@@ -25,3 +25,7 @@ dist-ssr
 *.env
 .env
 .env.*
+
+# Local JSON datastore - holds user profiles, Pinterest tokens, and reviews.
+# Never commit real user data.
+data/db.json

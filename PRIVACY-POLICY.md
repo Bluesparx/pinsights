@@ -1,42 +1,55 @@
-
-### PRIVACY_POLICY.md
-
-```markdown
-# Privacy Policy for Pin Insights
+# Privacy Policy for Pinsights
 
 ## Introduction
 
-At Pin Insights, we value your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and share your information when you use our application.
+Pinsights connects to your Pinterest account to generate a short, AI-written
+review of your saved pins. This page explains, plainly, what we store and
+why.
 
-## Information We Collect
+## Information we collect
 
-- **Personal Information**: When you log in with your Pinterest account, we collect your access token and any other information provided by Pinterest.
-- **Usage Data**: We may collect information about how you interact with the application, including your pins and interactions.
+- **Account info**: when you connect with Pinterest, we save your Pinterest
+  user ID, username, profile picture, account type, and your Pinterest
+  access/refresh tokens, so you don't have to reconnect on every visit.
+- **Reviews**: the text of every review we generate is saved against your
+  account so it shows up on your dashboard.
+- **Pin content**: pin images and descriptions are read from the Pinterest
+  API and sent to Google's Gemini API to write your review. We don't keep
+  a copy of them afterward.
 
-## How We Use Your Information
+## How we use your information
 
-We use the information we collect for the following purposes:
+- To recognize you as a returning user (this is our only sign-up/login
+  mechanism - there's no separate password or third-party login).
+- To fetch and summarize your pins/boards for the review.
+- To show you your past reviews on your dashboard.
 
-- To authenticate users and provide access to the application.
-- To fetch and analyze user pins from Pinterest API at your end.
-- To generate personalized reviews based on your saved pins.
-- To improve the functionality and user experience of the application.
+We only ever request **read** access - the app cannot post, edit, or delete
+anything on your Pinterest account.
 
-## Data Sharing
+## Data sharing
 
-We do not sell or rent your personal information to third parties. We may share your information in the following circumstances:
+We do not sell or rent your information. Pin content is sent to Google's
+Gemini API solely to generate review text. We don't share anything with
+advertisers.
 
-- With service providers who assist us in operating our application (e.g., hosting services).
-- To comply with legal obligations or protect our rights.
+## Deleting your data
+
+Email us and we'll delete your account record, tokens, and saved reviews.
+You can also revoke Pinsights' access at any time from
+[pinterest.com/settings/apps](https://www.pinterest.com/settings/apps).
 
 ## Security
 
-We take appropriate measures to protect your personal information from unauthorized access, use, or disclosure. However, no method of transmission over the Internet or electronic storage is 100% secure.
+We take reasonable measures to protect stored information from loss, theft,
+misuse, and unauthorized access. No method of transmission or storage is
+ever 100% secure.
 
-## Changes to This Privacy Policy
+## Changes to this policy
 
-We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.
+We'll update this page if anything changes - there's no separate
+notification list.
 
-## Contact Us
+## Contact us
 
-If you have any questions or concerns about this Privacy Policy, please contact us at [naziahassan2288@gmail.com]
+Questions? Reach us at naziahassan2288@gmail.com

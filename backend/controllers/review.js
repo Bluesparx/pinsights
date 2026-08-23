@@ -2,227 +2,277 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import axios from 'axios';
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI } from '@google/genai';
 import sharp from 'sharp';
+import { addReview, getReviewsForUser } from '../db.js';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GEMINI_MODEL = 'gemini-3.5-flash-lite';
 
 const genAI = new GoogleGenAI({
     apiKey: GEMINI_API_KEY,
 });
 
-// ---------------------------------------------------------------------------
-// Rate-limit config (Gemini 2.0 Flash free tier: 15 RPM, 1 500 RPD)
+const MAX_PINS = 50;
+const REVIEW_IMAGE_COUNT = 6;
+const REVIEW_TEXT_COUNT = 6;
+const IMAGE_TIMEOUT = 8000;
+const PIN_TIMEOUT = 8000;
 
-const GEMINI_RPM          = 15;   
-const MIN_MS_BETWEEN_REQS = Math.ceil(60_000 / GEMINI_RPM); // ~4 000 ms
-const MAX_RETRIES         = 3;
-const BACKOFF_BASE_MS     = 5_000;       // 5 s base; doubles each retry
-const IMAGE_CONCURRENCY   = 3;           // parallel image-description calls
-
-// Simple token-bucket: track last-N request timestamps and wait if needed
-const requestTimestamps = [];
-
-const waitForRateLimit = async () => {
-    const now = Date.now();
-    // Drop timestamps older than 60 s
-    while (requestTimestamps.length && now - requestTimestamps[0] >= 60_000) {
-        requestTimestamps.shift();
+const randomSample = (items, count) => {
+    if (items.length <= count) {
+        return [...items];
     }
-    if (requestTimestamps.length >= GEMINI_RPM) {
-        // Must wait until the oldest timestamp is 60 s old
-        const waitMs = 60_000 - (now - requestTimestamps[0]) + 50; // +50 ms buffer
-        await new Promise(r => setTimeout(r, waitMs));
-        requestTimestamps.shift();
+
+    const result = [...items];
+
+    for (let i = result.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
     }
-    requestTimestamps.push(Date.now());
-};
 
-// Wrapper: wait for slot → call → retry on 429 with exponential backoff
-const callGeminiWithRetry = async (fn, retries = MAX_RETRIES) => {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-        await waitForRateLimit();
-        try {
-            return await fn();
-        } catch (err) {
-            const is429 = err?.status === 429 ||
-                          err?.response?.status === 429 ||
-                          err?.message?.includes('429') ||
-                          err?.message?.toLowerCase().includes('quota');
-
-            if (is429 && attempt < retries) {
-                const delay = BACKOFF_BASE_MS * 2 ** attempt;
-                console.warn(`Gemini 429 – waiting ${delay / 1000}s before retry ${attempt + 1}/${retries}`);
-                await new Promise(r => setTimeout(r, delay));
-                continue;
-            }
-            throw err;
-        }
-    }
-};
-
-// ---------------------------------------------------------------------------
-// Core helpers
-// ---------------------------------------------------------------------------
-
-const generateImageDescription = async (imageBuffer) => {
-    const base64Image = imageBuffer.toString("base64");
-
-    const response = await genAI.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: [
-            {
-                inlineData: {
-                    data: base64Image,
-                    mimeType: "image/jpeg",
-                },
-            },
-            {
-                text: "Describe this image concisely in one sentence.",
-            },
-        ],
-    });
-
-    return response.text.trim();
-};
-const generateReviewText = async (prompt) => {
-    const response = await genAI.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-    });
-
-    return response.text.trim();
-};
-
-const asyncPool = async (concurrency, items, fn) => {
-    const results = [];
-    const executing = new Set();
-
-    for (const item of items) {
-        const promise = fn(item).then(r => { results.push({ status: 'fulfilled', value: r }); })
-                                .catch(e => { results.push({ status: 'rejected', reason: e }); });
-        executing.add(promise);
-        promise.finally(() => executing.delete(promise));
-
-        if (executing.size >= concurrency) {
-            await Promise.race(executing);
-        }
-    }
-    await Promise.all(executing);
-    return results;
-};
-
-const generateImageDescriptions = async (imageUrls) => {
-    const settled = await asyncPool(IMAGE_CONCURRENCY, imageUrls, async (url) => {
-        const response = await axios.get(url, { responseType: 'arraybuffer' });
-        const imageBuffer = await sharp(Buffer.from(response.data))
-            .resize(600)
-            .jpeg()
-            .toBuffer();
-        return generateImageDescription(imageBuffer);
-    });
-
-    return settled
-        .filter(r => r.status === 'fulfilled')
-        .map(r => r.value);
-};
-
-// ---------------------------------------------------------------------------
-// Utility
-// ---------------------------------------------------------------------------
-
-const selectRandomItems = (items, count) => {
-    const shuffled = [...items].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
+    return result.slice(0, count);
 };
 
 const extractPinImageUrl = (pin) =>
     pin?.media?.images?.['600x']?.url ||
+    pin?.media?.images?.['474x']?.url ||
     pin?.media?.images?.['236x']?.url ||
+    pin?.media?.images?.orig?.url ||
     pin?.image_url ||
-    pin?.media?.images?.['orig']?.url ||
     null;
 
 const extractPinText = (pin) =>
     pin?.description ||
     pin?.title ||
     pin?.alt_text ||
-    pin?.link ||
     pin?.rich_summary?.text ||
     '';
 
-// ---------------------------------------------------------------------------
-// Route handler
-// ---------------------------------------------------------------------------
+const fetchPinterestPins = async (accessToken) => {
+    const response = await axios.get('https://api.pinterest.com/v5/pins', {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+            page_size: MAX_PINS,
+        },
+        timeout: PIN_TIMEOUT,
+    });
+
+    return response.data?.items || [];
+};
+
+const fetchAndProcessImage = async (url) => {
+    const response = await axios.get(url, {
+        responseType: 'arraybuffer',
+        timeout: IMAGE_TIMEOUT,
+        maxContentLength: 10 * 1024 * 1024,
+        maxBodyLength: 10 * 1024 * 1024,
+    });
+
+    return sharp(response.data)
+        .resize(600, 600, {
+            fit: 'inside',
+            withoutEnlargement: true,
+        })
+        .jpeg({
+            quality: 80,
+            mozjpeg: true,
+        })
+        .toBuffer();
+};
+
+const prepareImages = async (pins) => {
+    const results = await Promise.allSettled(
+        pins.map(async (pin) => ({
+            buffer: await fetchAndProcessImage(pin.url),
+            text: pin.text,
+        }))
+    );
+
+    return results
+        .filter((result) => result.status === 'fulfilled')
+        .map((result) => result.value);
+};
+
+const generateReview = async (images, pinDescriptions) => {
+    const imageParts = images.map((imageBuffer) => ({
+        inlineData: {
+            data: imageBuffer.toString('base64'),
+            mimeType: 'image/jpeg',
+        },
+    }));
+
+    const textDescriptions = pinDescriptions.length
+        ? pinDescriptions.join('\n')
+        : 'No textual descriptions were available for the pins.';
+
+    const prompt = `You are reviewing a user's Pinterest profile based only on their Pinterest pins.
+
+Analyze the provided images and pin text together.
+
+Write a creative, thoughtful, cute, slightly playful review of their overall Pinterest persona and aesthetic.
+
+Look for:
+- Overall aesthetic and visual style
+- Recurring interests and themes
+- Personality traits suggested by the content
+- Color, fashion, lifestyle, design, or mood patterns
+- The kind of person their Pinterest presence makes them seem like
+
+Do not claim sensitive personal information. Keep the interpretation playful and clearly based only on their Pinterest content.
+
+Pin text:
+${textDescriptions}
+
+Write no more than 150 words. Do not use headings or bullet points. Make it natural, personal, witty, thoughtful, and cute.`;
+
+    const response = await genAI.models.generateContent({
+        model: GEMINI_MODEL,
+        contents: [
+            ...imageParts,
+            {
+                text: prompt,
+            },
+        ],
+        config: {
+            temperature: 0.8,
+            maxOutputTokens: 300,
+        },
+    });
+
+    return response.text?.trim() || '';
+};
 
 const fetchReview = async (req, res) => {
     try {
-        console.log("Fetching review...");
-        const { accessToken } = req.body;
+        const {
+            access_token: accessToken,
+            pinterest_user_id: pinterestUserId,
+        } = req.user;
 
         if (!accessToken) {
-            return res.status(400).json({ error: 'Access token is required' });
-        }
-
-        const pinterestResponse = await axios.get('https://api.pinterest.com/v5/pins', {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const pins = pinterestResponse.data.items || [];
-        if (pins.length === 0) {
-            return res.status(404).json({ error: 'No pins found for this user' });
-        }
-
-        // Cap at 50 pins as per spec
-        const candidate_pins = pins.slice(0, 50);
-
-        const imageUrls     = candidate_pins.map(extractPinImageUrl).filter(Boolean);
-        const pinDescriptions = candidate_pins.map(extractPinText).filter(Boolean);
-
-        let descriptions = [];
-
-        if (imageUrls.length > 0) {
-            // 6 images → 6 Gemini calls + 1 review call = 7 total
-            // Well within 15 RPM; concurrency cap keeps burst polite
-            const selectedImages = selectRandomItems(imageUrls, 6);
-            const imageDescriptions = await generateImageDescriptions(selectedImages);
-            descriptions = descriptions.concat(imageDescriptions);
-        }
-
-        // Fall back to text descriptions if image analysis yielded < 3 results
-        if (descriptions.length < 3 && pinDescriptions.length > 0) {
-            descriptions = descriptions.concat(selectRandomItems(pinDescriptions, 6));
-        }
-
-        if (descriptions.length === 0) {
-            return res.status(404).json({ error: 'No usable pin content found to generate review' });
-        }
-
-        const prompt = `A user authorised you to evaluate their Pinterest pins and you found these descriptions. Provide a creative review about their overall persona. Descriptions: ${descriptions.join('. ')} Your review should be thoughtful and cute, not more than 150 words.`;
-
-        const result = await generateReviewText(prompt);
-
-        if (!result) {
-            return res.status(500).json({ error: 'Failed to generate a review' });
-        }
-
-        console.log("Review generated!");
-        return res.status(200).json(result);
-
-    } catch (error) {
-        console.error("Error in fetchReview:", error);
-
-        if (error.response) {
-            return res.status(error.response.status || 500).json({
-                error: error.response.data?.error || 'Error generating review',
-                details: error.response.data?.message || error.message,
+            return res.status(400).json({
+                error: 'Access token is required',
             });
         }
 
-        return res.status(500).json({ error: 'Error generating review', details: error.message });
+        if (!pinterestUserId) {
+            return res.status(400).json({
+                error: 'Pinterest user ID is required',
+            });
+        }
+
+        const pins = await fetchPinterestPins(accessToken);
+
+        if (!pins.length) {
+            return res.status(404).json({
+                error: 'No pins found for this user',
+            });
+        }
+
+        const candidatePins = pins.slice(0, MAX_PINS);
+
+        const imageCandidates = candidatePins
+            .map((pin) => ({
+                url: extractPinImageUrl(pin),
+                text: extractPinText(pin),
+            }))
+            .filter((pin) => pin.url);
+
+        const textCandidates = candidatePins
+            .map(extractPinText)
+            .filter(Boolean);
+
+        const selectedImagePins = randomSample(
+            imageCandidates,
+            REVIEW_IMAGE_COUNT
+        );
+
+        const selectedTextPins = randomSample(
+            textCandidates,
+            REVIEW_TEXT_COUNT
+        );
+
+        const processedImages = await prepareImages(selectedImagePins);
+
+        const images = processedImages.map(({ buffer }) => buffer);
+
+        const imageTexts = processedImages
+            .map(({ text }) => text)
+            .filter(Boolean);
+
+        const reviewTexts = randomSample(
+            [...selectedTextPins, ...imageTexts],
+            REVIEW_TEXT_COUNT
+        );
+
+        if (!images.length && !reviewTexts.length) {
+            return res.status(404).json({
+                error: 'No usable pin content found to generate review',
+            });
+        }
+
+        const review = await generateReview(images, reviewTexts);
+
+        if (!review) {
+            return res.status(500).json({
+                error: 'Failed to generate a review',
+            });
+        }
+
+        const saved = await addReview(
+            pinterestUserId,
+            review,
+            {
+                pin_count: candidatePins.length,
+                image_count: images.length,
+            }
+        );
+
+        return res.status(200).json({
+            id: saved.id,
+            review,
+            created_at: saved.created_at,
+        });
+    } catch (error) {
+        console.error('Error in fetchReview:', error);
+
+        if (error.response) {
+            return res.status(error.response.status || 500).json({
+                error:
+                    error.response.data?.error ||
+                    'Error generating review',
+                details:
+                    error.response.data?.message ||
+                    error.message,
+            });
+        }
+
+        return res.status(500).json({
+            error: 'Error generating review',
+            details: error.message,
+        });
+    }
+};
+
+export const getReviewHistory = async (req, res) => {
+    try {
+        const reviews = await getReviewsForUser(
+            req.user.pinterest_user_id
+        );
+
+        return res.status(200).json({
+            reviews,
+        });
+    } catch (error) {
+        console.error('Error in getReviewHistory:', error);
+
+        return res.status(500).json({
+            error: 'Error fetching review history',
+            details: error.message,
+        });
     }
 };
 
