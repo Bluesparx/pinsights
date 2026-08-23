@@ -82,8 +82,8 @@ const ReviewResult = () => {
 
                             {!loading && !error && review && (
                                 <>
-                                <div className="bg-ink">
-                                    <h2 className="text-cream text-xl font-display font-bold text-center">Your Review</h2>
+                                <div>
+                                    <h2 className="text-candy-pink-dark text-xl font-display font-bold text-center p-2">Your Review</h2>
                                 </div>
                                     <p className="text-ink leading-relaxed whitespace-pre-line text-lg mb-6">
                                         {review}
