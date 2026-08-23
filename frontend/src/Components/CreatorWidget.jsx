@@ -6,24 +6,10 @@ const KOFI_URL = import.meta.env.VITE_KOFI_URL || 'https://ko-fi.com/';
 
 const CreatorWidget = () => {
     const [hovered, setHovered] = useState(false);
-    const [canExpand, setCanExpand] = useState(false);
-
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(min-width: 640px)');
-        const updateCanExpand = () => {
-            setCanExpand(mediaQuery.matches);
-            if (!mediaQuery.matches) setHovered(false);
-        };
-        updateCanExpand();
-        mediaQuery.addEventListener('change', updateCanExpand);
-        return () => mediaQuery.removeEventListener('change', updateCanExpand);
-    }, []);
 
     useEffect(() => {
         let closeTimer;
         const openTimer = window.setTimeout(() => {
-            if (!window.matchMedia('(min-width: 640px)').matches) return;
-
             setHovered(true);
             closeTimer = window.setTimeout(() => setHovered(false), 3000);
         }, 10000);
@@ -40,8 +26,8 @@ const CreatorWidget = () => {
             href={KOFI_URL}
             target="_blank"
             rel="noreferrer"
-            onMouseEnter={() => canExpand && setHovered(true)}
-            onMouseLeave={() => canExpand && setHovered(false)}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
             className="fixed z-[80] bottom-4 right-4 sm:bottom-6 sm:right-6 flex items-center group"
             style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
             aria-label="Support the creator on Ko-fi"
@@ -49,7 +35,7 @@ const CreatorWidget = () => {
             {/* text pill */}
             <span
                 className={`
-                    hidden sm:flex items-center gap-2 bg-ink text-cream text-sm font-semibold
+                    flex items-center gap-2 bg-ink text-cream text-sm font-semibold
                     pixel-corners pl-4 pr-3 py-2.5 shadow-warm-lg mr-[-1.25rem]
                     transition-all duration-300 ease-out whitespace-nowrap
                     ${hovered ? 'opacity-100 translate-x-0 pr-8' : 'opacity-0 translate-x-4 pointer-events-none'}

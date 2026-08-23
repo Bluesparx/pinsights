@@ -72,7 +72,7 @@ const ReviewModal = ({ review, originRect, accentClass, onClose }) => {
                 style={{ transform: visible ? 'translate(0px,0px) scale(1)' : startTransform }}
                 className={`
                     relative w-full max-w-lg max-h-[85vh] overflow-y-auto
-                    bg-cream-card border-4 border-white pixel-corners shadow-warm-lg
+                    ${accentClass} pixel-border-white pixel-corners shadow-warm-lg
                     p-6 sm:p-8
                     transition-all duration-200 ease-out
                     ${visible ? 'opacity-100' : 'opacity-0'}
@@ -83,12 +83,12 @@ const ReviewModal = ({ review, originRect, accentClass, onClose }) => {
                 <button
                     onClick={requestClose}
                     aria-label="Close"
-                    className={`absolute top-4 right-4 w-9 h-9 pixel-corners ${accentClass} hover:opacity-80 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90`}
+                    className={`absolute top-4 right-4 w-9 h-9 rounded-full ${accentClass} hover:opacity-80 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90`}
                 >
                     <X className="w-4.5 h-4.5" />
                 </button>
 
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-candy-pink-dark bg-candy-pink/10 px-3 py-1 pixel-corners mb-4">
+                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-navy-blue-70 bg-gray-50 px-3 py-1 rounded-full mb-4">
                     <ImageIcon className="w-3.5 h-3.5" />
                     Detailed Analysis
                 </span>
@@ -97,7 +97,7 @@ const ReviewModal = ({ review, originRect, accentClass, onClose }) => {
                     {review.review_text}
                 </p>
 
-                <div className="flex items-center gap-1.5 text-sm text-ink/50 pt-4 border-t border-cream-deep">
+                <div className={`flex items-center gap-1.5 text-sm text-ink/60 pt-4 border-t border-ink/20`}>
                     <Clock className="w-4 h-4" />
                     {timeAgo(review.created_at)}
                     {review.pin_count ? ` · based on ${review.pin_count} pins` : ''}

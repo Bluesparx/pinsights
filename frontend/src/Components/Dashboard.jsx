@@ -79,7 +79,7 @@ const Dashboard = () => {
             <div className="min-h-[calc(100vh-64px)] bg-cream">
                 <div className="max-w-4xl mx-auto px-4 py-10">
                     {/* Welcome */}
-                    <div className="bg-white pixel-corners shadow-warm p-6 sm:p-8 mb-10 flex flex-col sm:flex-row sm:items-center gap-5 sm:justify-between border-t-4 border-mustard">
+                    <div className="bg-white pixel-border-mustard pixel-corners shadow-warm p-6 sm:p-8 mb-10 flex flex-col sm:flex-row sm:items-center gap-5 sm:justify-between">
                         <div className="flex items-center gap-4">
                             {user?.profile_image ? (
                                 <img

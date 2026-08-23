@@ -108,9 +108,10 @@ const generateReview = async (images, pinDescriptions) => {
         ? pinDescriptions.join('\n')
         : 'No textual descriptions were available for the pins.';
 
-    const prompt = `You are reviewing a user's Pinterest profile based only on their Pinterest pins.
-
-Analyze the provided images and pin text together.
+    const prompt = 
+    `You are reviewing a user's Pinterest profile based only on the following text:
+Pin text:
+${textDescriptions}
 
 Write a creative, thoughtful, cute, slightly playful review of their overall Pinterest persona and aesthetic.
 
@@ -121,12 +122,10 @@ Look for:
 - Color, fashion, lifestyle, design, or mood patterns
 - The kind of person their Pinterest presence makes them seem like
 
-Do not claim sensitive personal information. Keep the interpretation playful and clearly based only on their Pinterest content.
+Do not claim sensitive personal information. Keep the tone playful and human, clearly based only on their content.
 
-Pin text:
-${textDescriptions}
-
-Write no more than 150 words. Do not use headings or bullet points. Make it natural, personal, witty, thoughtful, and cute.`;
+Write no more than 150 words. Do not use headings or bullet points.
+`;
 
     const response = await genAI.models.generateContent({
         model: GEMINI_MODEL,

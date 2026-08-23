@@ -5,9 +5,9 @@ const PrivacyPolicy = () => {
     return (
         <div className="text-ink/60">
             <p className="mb-6 text-ink">
-                Short version: we use your Pinterest saves to write you a review, and we keep a
+                tl/dr : we use your Pinterest saves to write you a review, and we keep a
                 copy of that review (and a little account info) so you can come back and see it
-                later. That's it. Here's the longer version.
+                later.
             </p>
 
             <div className="mb-8">

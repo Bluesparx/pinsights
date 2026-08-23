@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, Sparkles } from 'lucide-react';
 import api from '../api';
@@ -12,6 +12,8 @@ const Login = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(false);
+    const authCheckStarted = useRef(false);
+    const codeExchangeStarted = useRef(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -19,10 +21,14 @@ const Login = () => {
         const authorizationCode = query.get('code');
 
         if (authorizationCode) {
+            if (codeExchangeStarted.current) return;
+            codeExchangeStarted.current = true;
             exchangeCodeForSession(authorizationCode);
             return;
         }
 
+        if (authCheckStarted.current) return;
+        authCheckStarted.current = true;
         api.get('/auth/me')
             .then(() => setAlreadyLoggedIn(true))
             .catch(() => setAlreadyLoggedIn(false));
@@ -86,22 +92,12 @@ const Login = () => {
             <Navbar />
             <div className="min-h-[calc(100vh-64px)] bg-cream flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-lg">
-                    <div className="flex justify-center gap-2 mb-6">
-                        {PIN_COLORS.map((c, i) => (
-                            <div
-                                key={i}
-                                className={`w-3 pixel-corners ${c} animate-floaty`}
-                                style={{ height: `${18 + i * 10}px`, animationDelay: `${i * 0.2}s` }}
-                            />
-                        ))}
-                    </div>
-
-                    <div className="bg-white pixel-corners shadow-warm p-8 sm:p-10 text-center border-t-4 border-mustard">
+                    <div className="bg-white pixel-border-mustard pixel-corners shadow-warm p-8 sm:p-10 text-center">
                         <h1 className="text-3xl font-display font-extrabold text-ink mb-2 tracking-tight">
                             Pinsights
                         </h1>
                         <p className="text-ink/60 mb-8">
-                            Let's find out your vibe in pinterest based on your saves! ^^ 
+                            Let's find out your vibe based on your pins! ^^ 
                         </p>
 
                         {error && (

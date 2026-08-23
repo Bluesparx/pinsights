@@ -36,13 +36,10 @@ body, #root {
   background-color: #FFF8EA;
 }
 
-/* Smooth, organic feel for anything interactive that doesn't already
-   specify its own transition. */
 button, a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Gentle custom scrollbar so the modal's overflow scroll feels intentional */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -55,6 +52,7 @@ button, a {
 }
 
 .pixel-corners {
+  position: relative;
   clip-path: polygon(
     0px calc(100% - 20px), 4px calc(100% - 20px), 4px calc(100% - 12px),
     8px calc(100% - 12px), 8px calc(100% - 8px), 12px calc(100% - 8px),
@@ -71,8 +69,93 @@ button, a {
   );
 }
 
-/* A filter outline follows the clipped stepped edge, unlike a normal border. */
+.pixel-border-black,
+.pixel-border-white,
+.pixel-border-mustard,
+.pixel-border-mustard-lite {
+  --pixel-border-color: #5e3d50;
+  position: relative;
+  border: none;
+  filter: none;
+}
+
+.pixel-border-black::before,
+.pixel-border-white::before,
+.pixel-border-mustard::before,
+.pixel-border-mustard-lite::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background: var(--pixel-border-color);
+
+  clip-path: polygon(
+    0px calc(100% - 20px), 4px calc(100% - 20px), 4px calc(100% - 12px),
+    8px calc(100% - 12px), 8px calc(100% - 8px), 12px calc(100% - 8px),
+    12px calc(100% - 4px), 20px calc(100% - 4px), 20px 100%,
+    calc(100% - 20px) 100%, calc(100% - 20px) calc(100% - 4px),
+    calc(100% - 12px) calc(100% - 4px), calc(100% - 12px) calc(100% - 8px),
+    calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) calc(100% - 12px),
+    calc(100% - 4px) calc(100% - 12px), calc(100% - 4px) calc(100% - 20px),
+    100% calc(100% - 20px), 100% 20px, calc(100% - 4px) 20px,
+    calc(100% - 4px) 12px, calc(100% - 8px) 12px, calc(100% - 8px) 8px,
+    calc(100% - 12px) 8px, calc(100% - 12px) 4px, calc(100% - 20px) 4px,
+    calc(100% - 20px) 0px, 20px 0px, 20px 4px, 12px 4px, 12px 8px,
+    8px 8px, 8px 12px, 4px 12px, 4px 20px, 0px 20px
+  );
+}
+
+.pixel-border-black::after,
+.pixel-border-white::after,
+.pixel-border-mustard::after,
+.pixel-border-mustard-lite::after{
+  content: "";
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+
+  background: inherit;
+
+  clip-path: inherit;
+}
+
 .pixel-border-black {
-  border: 0;
-  filter: drop-shadow(0 0 0 #000);
+  --pixel-border-color: #5e3d50;
+}
+
+.pixel-border-white {
+  --pixel-border-color: #534aa1;
+}Fprivacy
+
+.pixel-border-mustard {
+  --pixel-border-color: #f1ca54;
+}
+
+.pixel-border-mustard-lite {
+  --pixel-border-color: #ecd489;
+}
+
+@keyframes sparkle-sweep {
+  0% {
+    transform: translateX(-18px);
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(18px);
+    opacity: 0;
+  }
+}
+
+.sparkle-sweep {
+  animation: sparkle-sweep 4s ease-in-out infinite;
 }

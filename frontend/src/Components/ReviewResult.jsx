@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader2, ArrowLeft, RefreshCw } from 'lucide-react';
 import api from '../api';
@@ -9,6 +9,7 @@ const ReviewResult = () => {
     const [review, setReview] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const generationStarted = useRef(false);
     const navigate = useNavigate();
 
     const generate = async () => {
@@ -35,6 +36,8 @@ const ReviewResult = () => {
     };
 
     useEffect(() => {
+        if (generationStarted.current) return;
+        generationStarted.current = true;
         generate();
     }, []);
 
@@ -50,10 +53,7 @@ const ReviewResult = () => {
                         <ArrowLeft className="w-4 h-4" />
                         Back to dashboard
                     </Link>
-                    <div className="bg-white pixel-corners shadow-warm overflow-hidden border-t-4 border-mustard">
-                        <div className="bg-ink p-5">
-                            <h2 className="text-cream text-xl font-display font-bold text-center">Your Pinterest Analysis</h2>
-                        </div>
+                    <div className="bg-white pixel-border-mustard pixel-corners shadow-warm overflow-hidden">
 
                         <div className="p-8">
                             {loading && (
@@ -82,20 +82,23 @@ const ReviewResult = () => {
 
                             {!loading && !error && review && (
                                 <>
+                                <div className="bg-ink">
+                                    <h2 className="text-cream text-xl font-display font-bold text-center">Your Review</h2>
+                                </div>
                                     <p className="text-ink leading-relaxed whitespace-pre-line text-lg mb-6">
                                         {review}
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-3">
                                             <button
                                                 onClick={generate}
-                                                className="flex-1 inline-flex items-center justify-center gap-2 border-2 border-cream-deep hover:bg-cream-deep hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-2.5 px-6 pixel-corners transition-all duration-200"
+                                                className="flex-1 inline-flex items-center justify-center gap-2 pixel-border-mustard-lite bg-cream-deep hover:bg-cream-deep-80 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-2.5 px-6 pixel-corners transition-all duration-200"
                                             >
                                             <RefreshCw className="w-4 h-4" />
                                             Generate another
                                         </button>
                                         <Link
                                             to="/dashboard"
-                                               className="flex-1 text-center bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
+                                               className="flex-1 text-center bg-candy-pink hover:text-white hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
                                         >
                                             Done
                                         </Link>
