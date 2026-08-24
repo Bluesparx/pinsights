@@ -34,6 +34,11 @@ module.exports = {
           blue: '#5B8DEF',
           purple: '#8C6FF7',
         },
+        'custom-pink': '#F6CBDD',
+        'custom-blue': '#BFDDE6',
+        'custom-yellow': '#FAE7A1',
+        'custom-green': '#CDE8D3',
+        'custom-sand': '#EBD9B5',
         ink50: 'rgba(44,42,84,0.5)',
       },
       fontFamily: {

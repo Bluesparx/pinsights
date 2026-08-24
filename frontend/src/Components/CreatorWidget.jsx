@@ -12,7 +12,7 @@ const CreatorWidget = () => {
         const openTimer = window.setTimeout(() => {
             setHovered(true);
             closeTimer = window.setTimeout(() => setHovered(false), 3000);
-        }, 10000);
+        }, 6000);
 
         return () => {
             window.clearTimeout(openTimer);

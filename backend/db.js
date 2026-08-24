@@ -200,6 +200,7 @@ export const addReview = async (
         pinterest_user_id: pinterestUserId,
         review_text: reviewText,
         pin_count: meta.pin_count || null,
+        personality: meta.personality || null,
         created_at: new Date().toISOString(),
     };
 
@@ -214,6 +215,20 @@ export const addReview = async (
     }
 
     return data;
+};
+
+export const getReviewCountSince = async (pinterestUserId, since) => {
+    const { count, error } = await supabase
+        .from('reviews')
+        .select('id', { count: 'exact', head: true })
+        .eq('pinterest_user_id', pinterestUserId)
+        .gte('created_at', since);
+
+    if (error) {
+        throw error;
+    }
+
+    return count || 0;
 };
 
 export const getReviewsForUser = async (pinterestUserId) => {

@@ -4,7 +4,11 @@ dotenv.config();
 import axios from 'axios';
 import { GoogleGenAI } from '@google/genai';
 import sharp from 'sharp';
-import { addReview, getReviewsForUser } from '../db.js';
+import {
+    addReview,
+    getReviewCountSince,
+    getReviewsForUser,
+} from '../db.js';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = 'gemini-3.5-flash-lite';
@@ -18,6 +22,8 @@ const REVIEW_IMAGE_COUNT = 6;
 const REVIEW_TEXT_COUNT = 6;
 const IMAGE_TIMEOUT = 8000;
 const PIN_TIMEOUT = 8000;
+const MAX_DAILY_REVIEWS = 3;
+const REVIEW_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 const randomSample = (items, count) => {
     if (items.length <= count) {
@@ -124,7 +130,10 @@ Look for:
 
 Do not claim sensitive personal information. Keep the tone playful and human, clearly based only on their content.
 
-Write no more than 150 words. Do not use headings or bullet points.
+Also distill their whole vibe into a single word or short hyphenated title (like "Dreamer", "Maximalist", "Cottagecore-Romantic", "Night-Owl") that could finish the sentence "You are a ___". Pick something specific and flattering, not generic like "Person" or "User".
+
+Respond with ONLY a JSON object, no markdown fences, no extra text, in exactly this shape:
+{"review": "the review text, no more than 150 words, no headings or bullet points", "personality": "the single word or short hyphenated title"}
 `;
 
     const response = await genAI.models.generateContent({
@@ -137,11 +146,23 @@ Write no more than 150 words. Do not use headings or bullet points.
         ],
         config: {
             temperature: 0.8,
-            maxOutputTokens: 300,
+            maxOutputTokens: 350,
+            responseMimeType: 'application/json',
         },
     });
 
-    return response.text?.trim() || '';
+    const raw = response.text?.trim() || '';
+
+    try {
+        const parsed = JSON.parse(raw);
+        return {
+            review: (parsed.review || '').trim(),
+            personality: (parsed.personality || '').trim(),
+        };
+    } catch (err) {
+        console.error('Failed to parse Gemini JSON response, falling back to plain text:', raw);
+        return { review: raw, personality: 'Angel' };
+    }
 };
 
 const fetchReview = async (req, res) => {
@@ -160,6 +181,18 @@ const fetchReview = async (req, res) => {
         if (!pinterestUserId) {
             return res.status(400).json({
                 error: 'Pinterest user ID is required',
+            });
+        }
+
+        const reviewCount = await getReviewCountSince(
+            pinterestUserId,
+            new Date(Date.now() - REVIEW_WINDOW_MS).toISOString()
+        );
+
+        if (reviewCount >= MAX_DAILY_REVIEWS) {
+            return res.status(429).json({
+                error: 'Daily review limit reached',
+                details: `You can generate up to ${MAX_DAILY_REVIEWS} reviews in 24 hours.`,
             });
         }
 
@@ -213,7 +246,7 @@ const fetchReview = async (req, res) => {
             });
         }
 
-        const review = await generateReview(images, reviewTexts);
+        const { review, personality } = await generateReview(images, reviewTexts);
 
         if (!review) {
             return res.status(500).json({
@@ -227,12 +260,14 @@ const fetchReview = async (req, res) => {
             {
                 pin_count: candidatePins.length,
                 image_count: images.length,
+                personality,
             }
         );
 
         return res.status(200).json({
             id: saved.id,
             review,
+            personality: saved.personality,
             created_at: saved.created_at,
         });
     } catch (error) {

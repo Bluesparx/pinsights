@@ -121,11 +121,11 @@ button, a {
 }
 
 .pixel-border-black {
-  --pixel-border-color: #5e3d50;
+  --pixel-border-color: #949483;
 }
 
 .pixel-border-white {
-  --pixel-border-color: #534aa1;
+  --pixel-border-color: #75abca;
 }Fprivacy
 
 .pixel-border-mustard {
@@ -133,7 +133,7 @@ button, a {
 }
 
 .pixel-border-mustard-lite {
-  --pixel-border-color: #ecd489;
+  --pixel-border-color: #e7d07e;
 }
 
 @keyframes sparkle-sweep {

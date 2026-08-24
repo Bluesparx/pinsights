@@ -2,12 +2,11 @@ import React, { useMemo } from 'react';
 import { Clock } from 'lucide-react';
 
 const ACCENT_CLASSES = [
-    'bg-candy-pink',
-    'bg-candy-teal',
-    'bg-candy-coral',
-    'bg-candy-blue',
-    'bg-candy-mint',
-    'bg-candy-purple',
+    'bg-custom-pink',
+    'bg-custom-blue',
+    'bg-custom-yellow',
+    'bg-custom-green',
+    'bg-custom-sand'
 ];
 
 const tiltFromId = (id) => {
@@ -15,8 +14,8 @@ const tiltFromId = (id) => {
     for (let i = 0; i < id.length; i++) {
         hash = (hash * 31 + id.charCodeAt(i)) % 1000;
     }
-    // range: -6deg to 6deg
-    return ((hash % 1200) / 100) - 6;
+    // range: -5deg to 5deg
+    return ((hash % 1200) / 100) - 5;
 };
 
 const timeAgo = (iso) => {
