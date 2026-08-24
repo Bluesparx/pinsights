@@ -130,7 +130,7 @@ Look for:
 
 Do not claim sensitive personal information. Keep the tone playful and human, clearly based only on their content.
 
-Also distill their whole vibe into a single word or short hyphenated title (like "Dreamer", "Maximalist", "Cottagecore-Romantic", "Night-Owl") that could finish the sentence "You are a ___". Pick something specific and flattering, not generic like "Person" or "User".
+Also distill their whole vibe into a single word (a title, like "Dreamer", "Maximalist", "Hopeless-Romantic", "Night-Owl") that could finish the sentence "You are a ___". Pick something specific and flattering, not generic like "Person" or "User".
 
 Respond with ONLY a JSON object, no markdown fences, no extra text, in exactly this shape:
 {"review": "the review text, no more than 150 words, no headings or bullet points", "personality": "the single word or short hyphenated title"}
