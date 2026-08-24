@@ -6,40 +6,36 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Warm, organic palette pulled from the reference dashboard:
-        // deep indigo/navy chrome, a soft cream canvas, a mustard
-        // accent border, and a handful of candy-bright pastels used
-        // for badges, stickers, and highlights.
         ink: {
-          DEFAULT: '#2C2A54',
-          light: '#3D3A78',
-          dark: '#1F1D3D',
+          DEFAULT: '#534a6d',
+          light: '#756C8F',
+          dark: '#39344F',
         },
         cream: {
-          DEFAULT: '#FFF8EA',
-          card: '#FFFDF6',
-          deep: '#F3E7CE',
+          DEFAULT: '#fcdeb7',
+          card: '#f7d291',
+          deep: '#F4E8DC',
         },
         mustard: {
-          DEFAULT: '#F2C230',
-          dark: '#D9A81C',
+          DEFAULT: '#E7C979',
+          dark: '#C9A95D',
         },
         candy: {
-          pink: '#FF6FA0',
-          'pink-dark': '#E8548A',
-          teal: '#33C9C1',
-          'teal-dark': '#1FA79F',
-          mint: '#6BCB77',
-          coral: '#FF8A5B',
-          blue: '#5B8DEF',
-          purple: '#8C6FF7',
+          pink: '#EFA8BE',
+          'pink-dark': '#D88FA8',
+          teal: '#A8D8D1',
+          'teal-dark': '#82BDB5',
+          mint: '#B8DDBA',
+          coral: '#F3B49A',
+          blue: '#AFC8E8',
+          purple: '#C7B8E8',
         },
         'custom-pink': '#F6CBDD',
         'custom-blue': '#BFDDE6',
         'custom-yellow': '#FAE7A1',
         'custom-green': '#CDE8D3',
         'custom-sand': '#EBD9B5',
-        ink50: 'rgba(44,42,84,0.5)',
+        ink50: 'rgba(81,74,104,0.5)',
       },
       fontFamily: {
         sans: ['Fraunces', 'Georgia', 'serif'],

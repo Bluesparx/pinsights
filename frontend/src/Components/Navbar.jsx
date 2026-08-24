@@ -33,7 +33,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-ink sticky top-0 z-50 border-b-4 border-mustard">
+        <nav className="bg-ink/80 sticky top-0 z-50 border-b-4 border-mustard">
             <div className="max-w-5xl mx-auto px-4 sm:px-6">
                 <div className="flex justify-between items-center h-16">
                     <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2 group">

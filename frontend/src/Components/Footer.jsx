@@ -8,7 +8,7 @@ const Footer = () => {
                     Pinsights is an independent app and isn't affiliated with Pinterest, Inc.
                 </p>
                 <p className="text-xs text-ink/60">
-                    © <a href="#" className="hover:text-candy-pink">Naz</a> 2024–2026
+                    © <a href="#" className="hover:text-candy-pink">Nazia Hassan</a> 2026
                 </p>
             </div>
         </footer>

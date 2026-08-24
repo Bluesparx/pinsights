@@ -31,13 +31,12 @@ const DataDisclosure = ({ compact = false }) => (
             <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:gap-5">
 
                 <div className="flex gap-1.5 sm:gap-2">
-                    {['bg-candy-pink', 'bg-candy-teal', 'bg-mustard', 'bg-candy-pink'].map((color, index) => (
+                    {[ 'bg-mustard/50', 'bg-custom-blue', 'bg-custom-pink'].map((color, index) => (
                         <span
                             key={`${color}-${index}`}
                             className={`
                                 w-6 h-8
                                 sm:w-11 sm:h-14
-                                ${index === 3 ? 'sm:hidden' : ''}
                                 ${color}
                                 flex items-center justify-center
                                 shadow-[2px_2px_0_rgba(0,0,0,0.06)]
