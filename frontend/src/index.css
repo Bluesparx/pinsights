@@ -10,7 +10,7 @@
   font-weight: 500;
 
   color: #9c8fc7;
-  background-color: #FFF9F1;
+  background-color: #FFF8EA;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,12 +20,12 @@
 
 a {
   font-weight: 600;
-  color: #EFA8BE;
+  color: #FF6FA0;
   text-decoration: inherit;
   transition: color 0.2s ease;
 }
 a:hover {
-  color: #D88FA8;
+  color: #E8548A;
 }
 
 body, #root {
@@ -33,7 +33,7 @@ body, #root {
   min-width: 100vw;
   overflow-x: hidden;
   min-height: 100vh;
-  background-color: #FFF9F1;
+  background-color: #FFF8EA;
 }
 
 button, a {
@@ -47,7 +47,7 @@ button, a {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #F4E8DC;
+  background-color: #F3E7CE;
   border-radius: 999px;
 }
 
@@ -121,19 +121,19 @@ button, a {
 }
 
 .pixel-border-black {
-  --pixel-border-color: #C7B8C5;
+  --pixel-border-color: #949483;
 }
 
 .pixel-border-white {
-  --pixel-border-color: #BFDDE6;
+  --pixel-border-color: #75abca;
 }Fprivacy
 
 .pixel-border-mustard {
-  --pixel-border-color: #E7C979;
+  --pixel-border-color: #f1ca54;
 }
 
 .pixel-border-mustard-lite {
-  --pixel-border-color: #F0DFAE;
+  --pixel-border-color: #e7d07e;
 }
 
 @keyframes sparkle-sweep {

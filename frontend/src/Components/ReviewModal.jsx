@@ -71,7 +71,7 @@ const ReviewModal = ({ review, originRect, accentClass, onClose }) => {
             <div
                 style={{ transform: visible ? 'translate(0px,0px) scale(1)' : startTransform }}
                 className={`
-                    relative w-full max-w-lg
+                    relative w-full max-w-lg max-h-[85vh] overflow-y-auto
                     ${accentClass} pixel-border-white pixel-corners shadow-warm-lg
                     p-6 sm:p-8
                     transition-all duration-200 ease-out
