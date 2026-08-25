@@ -71,42 +71,43 @@ const ReviewModal = ({ review, originRect, accentClass, onClose }) => {
             <div
                 style={{ transform: visible ? 'translate(0px,0px) scale(1)' : startTransform }}
                 className={`
-                    relative w-full max-w-lg max-h-[85vh] overflow-y-auto
+                    relative w-full max-w-lg max-h-[85vh]
                     ${accentClass} pixel-border-white pixel-corners shadow-warm-lg
-                    p-6 sm:p-8
                     transition-all duration-200 ease-out
                     ${visible ? 'opacity-100' : 'opacity-0'}
                 `}
                 role="dialog"
                 aria-modal="true"
             >
-                <button
-                    onClick={requestClose}
-                    aria-label="Close"
-                    className={`absolute top-4 right-4 w-9 h-9 rounded-full ${accentClass} hover:opacity-80 text-white flex items-center justify-center transition-all duration-200 hover:rotate-90`}
-                >
-                    <X className="w-4.5 h-4.5" />
-                </button>
+                <div className="relative max-h-[calc(85vh-4px)] overflow-y-auto p-6 sm:p-8">
+                    <button
+                        onClick={requestClose}
+                        aria-label="Close"
+                        className={`absolute top-4 right-4 w-9 h-9 rounded-full ${accentClass} hover:opacity-80 text-ink flex items-center justify-center transition-all duration-200 hover:rotate-90`}
+                    >
+                        <X className="w-4.5 h-4.5" />
+                    </button>
 
-                <span className="inline-flex items-center gap-1.5 text-xs font-bold text-navy-blue-70 bg-gray-50 px-3 py-1 rounded-full mb-4">
-                    <ImageIcon className="w-3.5 h-3.5" />
-                    Detailed Analysis
-                </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-navy-blue-70 bg-gray-50 px-3 py-1 rounded-full mb-4">
+                        <ImageIcon className="w-3.5 h-3.5" />
+                        Detailed Analysis
+                    </span>
 
-                {review.personality && (
-                    <p className="font-display text-2xl sm:text-3xl font-extrabold text-ink mb-4 leading-snug">
-                        You are a <span className="text-candy-pink-dark">{review.personality}</span>
+                    {review.personality && (
+                        <p className="font-display text-2xl sm:text-3xl font-extrabold text-ink mb-4 leading-snug">
+                            You are a <span className="text-generated-blue">{review.personality}</span>
+                        </p>
+                    )}
+
+                    <p className="text-ink text-lg leading-relaxed whitespace-pre-line font-medium mb-6">
+                        {review.review_text}
                     </p>
-                )}
 
-                <p className="text-ink text-lg leading-relaxed whitespace-pre-line font-medium mb-6">
-                    {review.review_text}
-                </p>
-
-                <div className={`flex items-center gap-1.5 text-sm text-ink/60 pt-4 border-t border-ink/20`}>
-                    <Clock className="w-4 h-4" />
-                    {timeAgo(review.created_at)}
-                    {review.pin_count ? ` · based on ${review.pin_count} pins` : ''}
+                    <div className={`flex items-center gap-1.5 text-sm text-ink/60 pt-4 border-t border-ink/20`}>
+                        <Clock className="w-4 h-4" />
+                        {timeAgo(review.created_at)}
+                        {review.pin_count ? ` · based on ${review.pin_count} pins` : ''}
+                    </div>
                 </div>
             </div>
         </div>

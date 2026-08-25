@@ -7,6 +7,7 @@ import Footer from './Footer';
 
 const ReviewResult = () => {
     const [review, setReview] = useState('');
+    const [personality, setPersonality] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [rateLimited, setRateLimited] = useState(false);
@@ -18,9 +19,11 @@ const ReviewResult = () => {
         setError('');
         setRateLimited(false);
         setReview('');
+        setPersonality('');
         try {
             const response = await api.post('/review/generate');
             setReview(response.data.review);
+            setPersonality(response.data.personality || '');
         } catch (err) {
             if (err.response?.status === 401) {
                 navigate('/');
@@ -52,18 +55,18 @@ const ReviewResult = () => {
     }, []);
 
     return (
-        <>
+        <div className="min-h-screen flex flex-col">
             <Navbar />
-            <div className="min-h-[calc(100vh-64px)] bg-cream flex items-center justify-center px-4 py-12">
+            <div className="flex-1 min-h-[calc(100vh-64px)] bg-custom-pink flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-xl">
                     <Link
                         to="/dashboard"
-                        className="inline-flex items-center gap-1 text-sm font-medium text-ink/60 hover:text-ink mb-4"
+                        className="inline-flex items-center gap-1 text-sm font-medium text-ink/70 hover:text-ink mb-4"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         Back to dashboard
                     </Link>
-                    <div className="bg-white pixel-border-mustard pixel-corners shadow-warm overflow-hidden">
+                    <div className="bg-white-soft pixel-border-white pixel-corners shadow-warm overflow-hidden">
 
                         <div className="p-8">
                             {loading && (
@@ -79,7 +82,7 @@ const ReviewResult = () => {
                             {!loading && error && (
                                 <div
                                     role="alert"
-                                    className={`text-center py-6 ${rateLimited ? 'bg-cream-deep px-5 pixel-corners' : ''}`}
+                                    className={`text-center py-6 ${rateLimited ? 'bg-custom-pink/35 px-5 pixel-corners' : ''}`}
                                 >
                                     {rateLimited && (
                                         <Clock3 className="w-10 h-10 mx-auto mb-3 text-candy-pink-dark" />
@@ -91,14 +94,14 @@ const ReviewResult = () => {
                                     {rateLimited ? (
                                         <Link
                                             to="/dashboard"
-                                            className="inline-flex items-center justify-center bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
+                                            className="inline-flex items-center justify-center bg-candy-pink hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
                                         >
                                             Back to dashboard
                                         </Link>
                                     ) : (
                                         <button
                                             onClick={generate}
-                                            className="inline-flex items-center gap-2 bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
+                                            className="inline-flex items-center gap-2 bg-candy-pink hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
                                         >
                                             <RefreshCw className="w-4 h-4" />
                                             Try again
@@ -109,23 +112,25 @@ const ReviewResult = () => {
 
                             {!loading && !error && review && (
                                 <>
-                                <div>
-                                    <h2 className="text-candy-pink-dark text-xl font-display font-bold text-center p-2">Your Review</h2>
-                                </div>
+                                    {personality && (
+                                        <p className="font-display text-2xl sm:text-3xl font-extrabold text-ink mb-4 leading-snug">
+                                            You are a <span className="text-generated-blue">{personality}</span>
+                                        </p>
+                                    )}
                                     <p className="text-ink leading-relaxed whitespace-pre-line text-lg mb-6">
                                         {review}
                                     </p>
                                     <div className="flex flex-col sm:flex-row gap-3">
                                             <button
                                                 onClick={generate}
-                                                className="flex-1 inline-flex items-center justify-center gap-2 pixel-border-mustard-lite bg-cream-deep hover:bg-cream-deep-80 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-2.5 px-6 pixel-corners transition-all duration-200"
+                                                className="flex-1 inline-flex items-center justify-center gap-2 pixel-border-yellow-lite bg-custom-yellow hover:brightness-101 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-2.5 px-6 pixel-corners transition-all duration-200"
                                             >
                                             <RefreshCw className="w-4 h-4" />
                                             Generate another
                                         </button>
                                         <Link
                                             to="/dashboard"
-                                               className="flex-1 text-center bg-candy-pink hover:text-white hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
+                                               className="flex-1 text-center bg-candy-pink hover:text-ink hover:brightness-101 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-2.5 px-6 pixel-corners transition-all duration-200 shadow-warm"
                                         >
                                             Done
                                         </Link>
@@ -137,7 +142,7 @@ const ReviewResult = () => {
                 </div>
             </div>
             <Footer />
-        </>
+        </div>
     );
 };
 

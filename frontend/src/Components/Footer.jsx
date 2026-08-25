@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
     return (
-        <footer className="border-t border-cream-deep bg-white">
+        <footer className="border-t border-custom-yellow bg-white-soft">
             <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col sm:flex-row items-center justify-between gap-2">
                 <p className="text-xs text-ink/60">
                     Pinsights is an independent app and isn't affiliated with Pinterest, Inc.

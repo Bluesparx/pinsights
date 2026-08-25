@@ -2,11 +2,17 @@ import React, { useMemo } from 'react';
 import { Clock } from 'lucide-react';
 
 const ACCENT_CLASSES = [
-    'bg-custom-pink',
-    'bg-custom-blue',
-    'bg-custom-yellow',
-    'bg-custom-green',
-    'bg-custom-sand'
+    'bg-custom-matcha',
+    'bg-custom-sky',
+    'bg-custom-peach',
+    'bg-custom-lavender',
+    'bg-custom-ice',
+    'bg-custom-linen',
+    'bg-custom-sage',
+    'bg-custom-periwinkle',
+    'bg-custom-apricot',
+    'bg-custom-seafoam',
+    'bg-custom-banana'
 ];
 
 const tiltFromId = (id) => {
@@ -35,38 +41,39 @@ const ReviewCard = ({ review, index, onOpen }) => {
     const accentClass = ACCENT_CLASSES[index % ACCENT_CLASSES.length];
 
     return (
-        <button
-            type="button"
-            onClick={(e) => onOpen(review, e.currentTarget, accentClass)}
+        <div
             style={{ transform: `rotate(${tilt}deg)` }}
             className={`
-                group relative text-left bg-cream-card pixel-border-black
-                pixel-corners shadow-polaroid p-4 pb-6 w-full
+                group relative pixel-border-black pixel-corners shadow-polaroid p-[2px] w-full
                 transition-all duration-300 ease-out
                 hover:rotate-0 hover:scale-[1.04] hover:shadow-polaroid-hover
-                focus:outline-none focus-visible:ring-2 focus-visible:ring-mustard
-                cursor-pointer
             `}
         >
-            <span
-                className={`absolute -top-2 -right-2 w-5 h-5 pixel-corners ${accentClass} ring-4 ring-cream shadow-warm group-hover:scale-125 transition-transform duration-300`}
-                aria-hidden="true"
-            />
+            <button
+                type="button"
+                onClick={(e) => onOpen(review, e.currentTarget, accentClass)}
+                className={`
+                    group relative text-left ${accentClass} pixel-corners
+                    p-4 pb-6 w-full
+                    focus:outline-none focus-visible:ring-2 focus-visible:ring-custom-yellow
+                    cursor-pointer
+                `}
+            >
+                <p className="text-ink text-sm leading-relaxed whitespace-pre-line line-clamp-6 mb-3 font-medium">
+                    {review.review_text}
+                </p>
 
-            <p className="text-ink text-sm leading-relaxed whitespace-pre-line line-clamp-6 mb-3 font-medium">
-                {review.review_text}
-            </p>
-
-            <div className="flex items-center justify-between text-xs text-ink/50">
-                <span className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />
-                    {timeAgo(review.created_at)}
-                </span>
-                <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 font-semibold text-ink/70">
-                    Read more →
-                </span>
-            </div>
-        </button>
+                <div className="flex items-center justify-between text-xs text-ink/50">
+                    <span className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" />
+                        {timeAgo(review.created_at)}
+                    </span>
+                    <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 font-semibold text-ink/70">
+                        Read more →
+                    </span>
+                </div>
+            </button>
+        </div>
     );
 };
 

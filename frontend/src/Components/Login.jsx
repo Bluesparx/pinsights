@@ -73,9 +73,9 @@ const Login = () => {
 
     if (loading) {
         return (
-            <>
+            <div className="min-h-screen flex flex-col">
                 <Navbar />
-                <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-4">
+                <div className="flex flex-1 flex-col items-center justify-center min-h-[70vh] space-y-4">
                     <Loader2 className="h-8 w-8 animate-spin text-candy-pink" />
                     <div className="text-center space-y-1">
                         <p className="text-lg font-medium text-ink">Connecting…</p>
@@ -83,16 +83,16 @@ const Login = () => {
                     </div>
                 </div>
                 <Footer />
-            </>
+            </div>
         );
     }
 
     return (
-        <>
+        <div className="min-h-screen flex flex-col">
             <Navbar />
-            <div className="min-h-[calc(100vh-64px)] bg-cream flex items-center justify-center px-4 py-12">
+            <div className="flex-1 min-h-[calc(100vh-64px)] bg-custom-pink flex items-center justify-center px-4 py-12">
                 <div className="w-full max-w-lg">
-                    <div className="bg-white pixel-border-mustard pixel-corners shadow-warm p-8 sm:p-10 text-center">
+                    <div className="bg-white-soft pixel-border-yellow pixel-corners shadow-warm p-8 sm:p-10 text-center">
                         <h1 className="text-3xl font-display font-extrabold text-ink mb-2 tracking-tight">
                             Pinsights
                         </h1>
@@ -109,7 +109,7 @@ const Login = () => {
                         {alreadyLoggedIn ? (
                             <button
                                 onClick={() => navigate('/dashboard')}
-                                    className="inline-flex items-center gap-2 bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-3 px-8 pixel-corners transition-all duration-200 shadow-warm"
+                                    className="inline-flex items-center gap-2 bg-candy-pink hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-3 px-8 pixel-corners transition-all duration-200 shadow-warm"
                             >
                                 <Sparkles className="w-4 h-4" />
                                 Go to your dashboard
@@ -117,13 +117,13 @@ const Login = () => {
                         ) : (
                             <button
                                 onClick={handlePinterestAuth}
-                                    className="bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white font-bold py-3 px-8 pixel-corners w-full max-w-xs transition-all duration-200 shadow-warm"
+                                    className="bg-candy-pink hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink font-bold py-3 px-8 pixel-corners w-full max-w-xs transition-all duration-200 shadow-warm"
                             >
                                 Continue with Pinterest
                             </button>
                         )}
 
-                        <div className="mt-10 pt-8 border-t border-cream-deep text-left">
+                        <div className="mt-10 pt-8 border-t border-custom-yellow text-left">
                             <p className="text-sm text-ink/60 mb-4 text-center">
                                What happens when you connect?
                             </p>
@@ -140,7 +140,7 @@ const Login = () => {
                 </div>
             </div>
             <Footer />
-        </>
+        </div>
     );
 };
 

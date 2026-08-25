@@ -10,7 +10,7 @@
   font-weight: 500;
 
   color: #9c8fc7;
-  background-color: #FFF8EA;
+  background-color: #F6CBDD;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,12 +20,12 @@
 
 a {
   font-weight: 600;
-  color: #FF6FA0;
+  color: #D88FA8;
   text-decoration: inherit;
   transition: color 0.2s ease;
 }
 a:hover {
-  color: #E8548A;
+  color: #ca668d;
 }
 
 body, #root {
@@ -33,7 +33,7 @@ body, #root {
   min-width: 100vw;
   overflow-x: hidden;
   min-height: 100vh;
-  background-color: #FFF8EA;
+  background-color: #F6CBDD;
 }
 
 button, a {
@@ -47,7 +47,7 @@ button, a {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: #F3E7CE;
+  background-color: #F8EAF0;
   border-radius: 999px;
 }
 
@@ -71,8 +71,8 @@ button, a {
 
 .pixel-border-black,
 .pixel-border-white,
-.pixel-border-mustard,
-.pixel-border-mustard-lite {
+.pixel-border-yellow,
+.pixel-border-yellow-lite {
   --pixel-border-color: #5e3d50;
   position: relative;
   border: none;
@@ -81,8 +81,8 @@ button, a {
 
 .pixel-border-black::before,
 .pixel-border-white::before,
-.pixel-border-mustard::before,
-.pixel-border-mustard-lite::before {
+.pixel-border-yellow::before,
+.pixel-border-yellow-lite::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -108,11 +108,11 @@ button, a {
 
 .pixel-border-black::after,
 .pixel-border-white::after,
-.pixel-border-mustard::after,
-.pixel-border-mustard-lite::after{
+.pixel-border-yellow::after,
+.pixel-border-yellow-lite::after{
   content: "";
   position: absolute;
-  inset: 1px;
+  inset: 2px;
   z-index: -1;
 
   background: inherit;
@@ -121,19 +121,19 @@ button, a {
 }
 
 .pixel-border-black {
-  --pixel-border-color: #949483;
+  --pixel-border-color: #d7b68d;
 }
 
 .pixel-border-white {
   --pixel-border-color: #75abca;
 }Fprivacy
 
-.pixel-border-mustard {
-  --pixel-border-color: #f1ca54;
+.pixel-border-yellow {
+  --pixel-border-color: #F0D6E1;
 }
 
-.pixel-border-mustard-lite {
-  --pixel-border-color: #e7d07e;
+.pixel-border-yellow-lite {
+  --pixel-border-color: #F6E8EE;
 }
 
 @keyframes sparkle-sweep {

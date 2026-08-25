@@ -33,20 +33,20 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-ink/80 sticky top-0 z-50 border-b-4 border-mustard">
+        <nav className="bg-custom-blue sticky top-0 z-50 border-b-4 border-custom-yellow">
             <div className="max-w-5xl mx-auto px-4 sm:px-6">
                 <div className="flex justify-between items-center h-16">
                     <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2 group">
                         <span className="transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
                             <img src={logo} alt="Pinsights logo" className="w-8 h-8 object-contain" />
                         </span>
-                        <span className="text-lg font-display font-bold text-cream tracking-tight">Pinsights</span>
+                        <span className="text-lg font-display font-bold text-ink tracking-tight">Pinsights</span>
                     </Link>
 
                     <div className="flex items-center gap-1 sm:gap-2">
                         <Link
                             to="/privacy-policy"
-                            className="text-sm font-medium text-cream/70 hover:text-cream hover:bg-white/10 pixel-corners px-3 sm:px-4 py-2 transition-all duration-200"
+                            className="text-sm font-medium text-ink/70 hover:text-ink hover:bg-ink/10 pixel-corners px-3 sm:px-4 py-2 transition-all duration-200"
                         >
                             <span>About</span>
                         </Link>
@@ -55,23 +55,23 @@ const Navbar = () => {
                             <>
                                 <Link
                                     to="/dashboard"
-                                    className="text-sm font-medium text-cream hover:bg-white/10 pixel-corners px-4 py-2 transition-all duration-200"
+                                    className="text-sm font-medium text-ink hover:bg-ink/10 pixel-corners px-4 py-2 transition-all duration-200"
                                 >
                                     Dashboard
                                 </Link>
                                 <button
                                     onClick={handleLogout}
-                                    className="flex items-center gap-2 text-sm font-medium text-cream hover:bg-white/10 pixel-corners pl-2 pr-3 py-1.5 transition-all duration-200 active:scale-95"
+                                    className="flex items-center gap-2 text-sm font-medium text-ink hover:bg-ink/10 pixel-corners pl-2 pr-3 py-1.5 transition-all duration-200 active:scale-95"
                                 >
                                     {user.profile_image ? (
                                         <img
                                             src={user.profile_image}
                                             alt={user.username}
-                                            className="w-7 h-7 rounded-full object-cover ring-1 ring-mustard/70"
+                                            className="w-7 h-7 rounded-full object-cover ring-1 ring-custom-yellow"
                                             referrerPolicy="no-referrer"
                                         />
                                     ) : (
-                                        <span className="w-7 h-7 bg-candy-pink text-white flex items-center justify-center text-xs font-bold ring-2 ring-mustard/70">
+                                        <span className="w-7 h-7 bg-custom-pink text-ink flex items-center justify-center text-xs font-bold ring-2 ring-custom-yellow">
                                             {user.username?.[0]?.toUpperCase() || '?'}
                                         </span>
                                     )}
@@ -83,7 +83,7 @@ const Navbar = () => {
                         {checked && !user && (
                             <Link
                                 to="/"
-                                className="bg-candy-pink hover:bg-candy-pink-dark hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-white text-sm font-bold pixel-corners px-4 py-2 transition-all duration-200 shadow-warm"
+                                className="bg-custom-pink hover:brightness-105 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-ink text-sm font-bold pixel-corners px-4 py-2 transition-all duration-200 shadow-warm"
                             >
                                 Log in
                             </Link>

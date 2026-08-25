@@ -14,7 +14,7 @@ const wontUse = [
 
 const DataDisclosure = ({ compact = false }) => (
     <div className={compact ? 'space-y-5' : 'space-y-8'}>
-        <div className="pixel-corners bg-cream px-4 py-4 sm:px-6 sm:py-5 pixel-border-mustard-lite">
+        <div className="pixel-corners bg-[#FCF8FA] px-4 py-4 sm:px-6 sm:py-5 pixel-border-yellow-lite">
             <div className="grid grid-cols-[1fr_auto_1fr] items-center mb-4">
                 <span className="text-[11px] sm:text-xs font-bold text-ink/55 text-center">
                     From your boards
@@ -31,7 +31,7 @@ const DataDisclosure = ({ compact = false }) => (
             <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:gap-5">
 
                 <div className="flex gap-1.5 sm:gap-2">
-                    {[ 'bg-mustard/50', 'bg-custom-blue', 'bg-custom-pink'].map((color, index) => (
+                    {[ 'bg-custom-yellow/70', 'bg-custom-blue', 'bg-custom-pink'].map((color, index) => (
                         <span
                             key={`${color}-${index}`}
                             className={`
@@ -42,18 +42,18 @@ const DataDisclosure = ({ compact = false }) => (
                                 shadow-[2px_2px_0_rgba(0,0,0,0.06)]
                             `}
                         >
-                            <Image className="w-4 h-4 text-white/80" />
+                            <Image className="w-4 h-4 text-ink/80" />
                         </span>
                     ))}
                 </div>
 
-                <div className="relative h-px bg-cream-deep/70">
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-cream px-2">
+                <div className="relative h-px bg-custom-yellow/70">
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FCF8FA] px-2">
                         <Sparkles className="sparkle-sweep w-4 h-4 text-candy-pink" />
                     </div>
                 </div>
 
-                <div className="bg-white pixel-corners pixel-border-white px-3 py-2.5 sm:px-4 sm:py-3 w-[135px] sm:w-[165px] shadow-warm">
+                <div className="bg-white-soft pixel-corners pixel-border-white px-3 py-2.5 sm:px-4 sm:py-3 w-[135px] sm:w-[165px] shadow-warm">
                     <p className="text-[10px] sm:text-[11px] leading-[1.35] text-ink/60 text-center">
                         A playful mix of color,
                         cozy details, and curious
